@@ -1,54 +1,49 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import { Statistics } from '../components/Statistics/Statistics.jsx';
 import { FeedBackOptions } from './Feedback/FeedBackOptions.jsx';
 import { Section } from './Section/Section.jsx';
 import { NotificationMessage } from './NotificationMessage/NotificationMessage.jsx';
 
-export class App extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  };
+export const App = () => {
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
 
-  countTotalFeedback = () => {
-    this.setState(prevState => {
-      return {
-        total: prevState.good + prevState.neutral + prevState.bad,
-      };
-    });
-  };
-  countPositiveFeedbackPercentage = () => {
-    this.setState(prevState => {
-      return {
-        percentage: Math.round((prevState.good / prevState.total) * 100),
-      };
-    });
-  };
-  handleIncrement = e => {
-    this.setState(prevState => {
-      const { name } = e.target;
-      return {
-        [name]: prevState[name] + 1,
-      };
-    });
-    this.countTotalFeedback();
-    this.countPositiveFeedbackPercentage();
-  };
-
-  render() {
-    const { good, neutral, bad } = this.state;
+  const stateKey = ['good', 'neutral', 'bad'];
+  
+  const totalFeedback = good + neutral + bad;
+  
+  const positiveFeedbackPercentage = Math.round((good / totalFeedback) * 100);
+  
+  const handleIncrement = (btnName) => {
+    switch (btnName) {
+      case 'good':
+        setGood(prevState => prevState + 1);
+        break;
+        case 'bad':
+          setBad(prevState => prevState + 1);
+          break;
+          case 'neutral':
+            setNeutral(prevState => prevState + 1);
+            break;
+            default:
+              break;
+            }
+          };
+          
+  const stateValue = { good, neutral, bad, totalFeedback, positiveFeedbackPercentage };
+  
     return (
       <>
         <Section title="Please leave feedback">
           <FeedBackOptions
-            options={Object.keys(this.state)}
-            onLeaveFeedback={this.handleIncrement}
+            options={stateKey}
+            onLeaveFeedback={handleIncrement}
           />
         </Section>
         <Section title="Statistics">
           {good !== 0 || neutral !== 0 || bad !== 0 ? (
-            <Statistics props={this.state} />
+            <Statistics props={stateValue} />
           ) : (
             <NotificationMessage />
           )}
@@ -56,4 +51,3 @@ export class App extends Component {
       </>
     );
   }
-}
